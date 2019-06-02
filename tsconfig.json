@@ -5,6 +5,7 @@
     "moduleResolution": "node",
     "strict": true,
     "esModuleInterop": true,
+    "incremental": true,
     "lib": ["esnext"],
     "outDir": "dist",
     "rootDir": "src",
