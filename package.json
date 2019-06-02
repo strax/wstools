@@ -1,0 +1,28 @@
+{
+  "name": "wstools",
+  "version": "0.1.0",
+  "description": "Tools for working with Yarn workspaces",
+  "bin": {
+    "wsviz": "./bin/wsviz",
+    "wsrun": "./bin/wsrun",
+    "wsbuild": "./bin/wsbuild"
+  },
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "dependencies": {
+    "@esfx/async": "1.0.0-pre.8",
+    "@esfx/disposable": "1.0.0-pre.8",
+    "chalk": "2.4.2"
+  },
+  "devDependencies": {
+    "typescript": "3.5.1",
+    "@types/node": "12.0.4"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT"
+}
