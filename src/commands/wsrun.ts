@@ -4,7 +4,7 @@ import * as OS from "os"
 import { series } from "../dgraph"
 import { runScript } from "../runner"
 import { Timer } from "../Timer"
-import { debug, info } from "../utils"
+import { debug, info } from "../output"
 import * as Yarn from "../yarn"
 
 interface RunScriptTask {

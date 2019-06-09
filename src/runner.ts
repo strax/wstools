@@ -3,7 +3,7 @@ import chalk from "chalk"
 import { exec as execA, ExecOptions, spawn } from "child_process"
 import { readManifest } from "./manifest"
 import { ProcessError } from "./ProcessError"
-import { error, stdout } from "./utils"
+import { error, stdout } from "./output"
 
 async function exec(command: string, opts: ExecOptions = {}): Promise<string> {
   const deferred = new Deferred<string>()
