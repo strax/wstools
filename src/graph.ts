@@ -18,13 +18,16 @@ export function dfs<V>(vertices: Iterable<V>, edges: (vertex: V) => Iterable<V>,
   }
 }
 
+// Standard topological sort
 export function toposort<T>(vertices: Array<T>, adjacent: (vertex: T) => Iterable<T>): Iterable<T> {
   const queue: Array<T> = []
   dfs(vertices, adjacent, p => queue.push(p))
   return queue
 }
 
-export function series<T>(vertices: Array<T>, edges: (vertex: T) => Iterable<T>): Iterable<Set<T>> {
+// Naive graph partitioning into nodes that can be executed in parallel
+// This algorithm is O(V * E) but works fast enough since there typically aren't over a hunder workspaces
+export function partition<T>(vertices: Array<T>, edges: (vertex: T) => Iterable<T>): Iterable<Set<T>> {
   const remaining = new Set<T>(vertices)
   const series: Array<Set<T>> = []
 
@@ -37,6 +40,7 @@ export function series<T>(vertices: Array<T>, edges: (vertex: T) => Iterable<T>)
     return true
   }
 
+  // TODO: Detect cycles, otherwise we'll loop forever
   while (remaining.size > 0) {
     const group = new Set<T>()
     for (const v of remaining) {

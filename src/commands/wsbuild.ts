@@ -1,4 +1,4 @@
-import { toposort } from "../dgraph"
+import { toposort } from "../graph"
 import { ProcessError } from "../ProcessError"
 import { runCommand } from "../runner"
 import * as Yarn from "../yarn"

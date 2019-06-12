@@ -49,7 +49,7 @@ export async function runScript(workspace: Workspace, script: string, args: Arra
   if (!command) {
     throw new Error(`no script named "${script} found`)
   }
-  stdout.writeLine(chalk.blue(workspace.name + ":") + " " + [command, ...args].join(" "))
+  // stdout.writeLine(chalk.blue(workspace.name + ":") + " " + [command, ...args].join(" "))
   try {
     return await exec([command, ...args].join(" "), { cwd: workspace.path, env: process.env })
   } catch (err) {
