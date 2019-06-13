@@ -7,6 +7,10 @@
     "wsrun": "./bin/wsrun",
     "wsbuild": "./bin/wsbuild"
   },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:strax/wstools.git"
+  },
   "files": [
     "dist",
     "bin"
