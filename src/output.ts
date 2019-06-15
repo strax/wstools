@@ -1,6 +1,8 @@
-import { EOL } from "os"
-import { Writable as WritableStream } from "stream"
-import chalk from "chalk"
+import chalk from "chalk";
+import { EOL } from "os";
+import { Writable as WritableStream } from "stream";
+
+const IS_DEBUG = !!process.env["WSTOOLS_DEBUG"]
 
 class StreamWrapper {
   constructor(private stream: WritableStream) {}
@@ -18,7 +20,9 @@ export const stdout = new StreamWrapper(process.stdout)
 export const stderr = new StreamWrapper(process.stderr)
 
 export function debug(message: string) {
-  stderr.writeLine(chalk.dim(`${message}`))
+  if (IS_DEBUG) {
+    stderr.writeLine(chalk.dim(`${message}`))
+  }
 }
 
 export function info(message: string) {
