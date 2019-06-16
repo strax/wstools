@@ -1,16 +1,20 @@
-import { debug } from "./output";
-import { AsyncQueue, AsyncManualResetEvent, AsyncCountdownEvent } from "@esfx/async";
-import { AsyncDisposable } from "@esfx/disposable";
+import { AsyncManualResetEvent, AsyncQueue } from "@esfx/async"
+import { AsyncDisposable } from "@esfx/disposable"
+import { debug } from "./output"
 
-export interface Task {
-  (): Promise<void>
+export interface Task<T> {
+  (): Promise<T>
 }
 
-export class Executor implements AsyncDisposable {
+export class Executor<T> implements AsyncDisposable {
   private running = true
   private status = new AsyncManualResetEvent(true)
 
-  constructor(private id: string, private queue: AsyncQueue<Task>) {
+  constructor(
+    private id: string,
+    private queue: AsyncQueue<Task<T>>,
+    private onTaskComplete: (result: T) => void
+  ) {
     this.run()
   }
 
@@ -20,8 +24,9 @@ export class Executor implements AsyncDisposable {
       debug(`${this.id}: awaiting work`)
       const task = await this.queue.get()
       this.status.reset()
-      await task()
+      const result = await task()
       this.status.set()
+      this.onTaskComplete(result)
     }
   }
 

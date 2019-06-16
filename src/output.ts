@@ -1,23 +1,17 @@
-import chalk from "chalk";
-import { EOL } from "os";
-import { Writable as WritableStream } from "stream";
+import chalk from "chalk"
+import { EOL } from "os"
+import { PassThrough } from "stream"
 
 const IS_DEBUG = !!process.env["WSTOOLS_DEBUG"]
 
-class StreamWrapper {
-  constructor(private stream: WritableStream) {}
-
-  write(content: string) {
-    this.stream.write(content)
-  }
-
+class LineStream extends PassThrough {
   writeLine(content: string) {
-    this.stream.write(content + EOL)
+    this.write(content + EOL)
   }
 }
 
-export const stdout = new StreamWrapper(process.stdout)
-export const stderr = new StreamWrapper(process.stderr)
+export const stdout = new LineStream()
+export const stderr = new LineStream()
 
 export function debug(message: string) {
   if (IS_DEBUG) {

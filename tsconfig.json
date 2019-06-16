@@ -7,6 +7,7 @@
     "esModuleInterop": true,
     "incremental": true,
     "sourceMap": true,
+    "jsx": "react",
     "lib": ["esnext"],
     "outDir": "dist",
     "rootDir": "src",

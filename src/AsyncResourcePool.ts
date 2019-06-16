@@ -1,29 +1,38 @@
-import { AsyncDisposable } from "@esfx/disposable";
-import { debug } from "./output";
-import { repeat } from "./utils";
-import { Executor, Task } from "./Task";
-import { AsyncQueue } from "@esfx/async";
+import { AsyncQueue, Deferred } from "@esfx/async"
+import { AsyncDisposable } from "@esfx/disposable"
 import OS from "os"
+import { debug } from "./output"
+import { Executor, Task } from "./Task"
+import { repeat } from "./utils"
 
-export class ExecutorGroup implements AsyncDisposable {
-  private executors = new Set<Executor>()
-  private queue = new AsyncQueue<Task>()
+export class ExecutorGroup<T> implements AsyncDisposable {
+  private executors = new Set<Executor<T>>()
+  private queue = new AsyncQueue<Task<T>>()
 
-  static autosized(id = "default"): ExecutorGroup {
-    return new ExecutorGroup(id, OS.cpus().length - 1)
+  static autosized<T>(onTaskComplete: (result: T) => void): ExecutorGroup<T> {
+    return new ExecutorGroup("autosized", OS.cpus().length - 1, onTaskComplete)
   }
 
-  constructor(private id: string, private size: number) {
+  constructor(private id: string, private size: number, onTaskComplete: (result: T) => void) {
     debug(`${this.id}: creating ${size} executors`)
-    repeat(size, i => this.executors.add(new Executor(`${this.id}-${i}`, this.queue)))
+    repeat(size, i =>
+      this.executors.add(new Executor(`${this.id}-${i}`, this.queue, onTaskComplete))
+    )
   }
 
-  schedule(task: Task) {
-    this.queue.put(task)
+  schedule(task: Task<T>): Promise<void> {
+    const started = new Deferred<void>()
+    this.queue.put(() => {
+      started.resolve()
+      return task()
+    })
+    return started.promise
   }
 
   async [AsyncDisposable.asyncDispose]() {
     debug(`${this.id}: disposing resources...`)
-    await Promise.all(Array.from(this.executors).map(resource => resource[AsyncDisposable.asyncDispose]()))
+    await Promise.all(
+      Array.from(this.executors).map(resource => resource[AsyncDisposable.asyncDispose]())
+    )
   }
 }

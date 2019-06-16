@@ -48,7 +48,9 @@ export async function findWorkspaces(cwd: string): Promise<Array<Workspace>> {
   // Second pass: inject dependencies
   for (const [name, info] of Object.entries(infoMap)) {
     if (info.mismatchedWorkspaceDependencies.length > 0) {
-      throw new Error(`mismatched workspace dependency: ${name} > ${info.mismatchedWorkspaceDependencies[0]}`)
+      throw new Error(
+        `mismatched workspace dependency: ${name} > ${info.mismatchedWorkspaceDependencies[0]}`
+      )
     }
     const workspace = index.get(name)!
     for (const dep of info.workspaceDependencies) {
