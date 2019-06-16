@@ -1,6 +1,6 @@
 {
   "name": "wstools",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Tools for working with Yarn workspaces",
   "bin": {
     "wsviz": "./bin/wsviz",
@@ -19,13 +19,13 @@
     "@esfx/async": "1.0.0-pre.8",
     "@esfx/disposable": "1.0.0-pre.8",
     "chalk": "2.4.2",
-    "react": "16.8.6",
     "ink": "2.2.0",
-    "ink-spinner": "3.0.1"
+    "ink-spinner": "3.0.1",
+    "react": "16.8.6"
   },
   "devDependencies": {
-    "typescript": "3.5.1",
-    "@types/node": "12.0.4"
+    "@types/node": "12.0.4",
+    "typescript": "3.5.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
