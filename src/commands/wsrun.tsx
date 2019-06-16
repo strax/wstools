@@ -13,11 +13,6 @@ import { indexed } from "../utils"
 import * as Yarn from "../yarn"
 
 interface RunScriptTask {
-  workspace: Workspace
-  script: string
-}
-
-interface RunScriptTask {
   script: string
   workspace: Workspace
   args: Array<string>
