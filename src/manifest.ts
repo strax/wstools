@@ -1,5 +1,6 @@
-import { promises as FS } from "fs"
+import FS from "fs"
 import Path from "path"
+import { promisify as encase } from "util"
 
 export interface Manifest {
   name: string
@@ -7,8 +8,10 @@ export interface Manifest {
   scripts?: Record<string, string>
 }
 
+const readFile = encase(FS.readFile)
+
 export async function readManifest(dirname: string) {
   const manifestPath = Path.resolve(dirname, "package.json")
-  const data = await FS.readFile(manifestPath, { encoding: "utf-8" })
+  const data = await readFile(manifestPath, { encoding: "utf-8" })
   return JSON.parse(data.toString()) as Manifest
 }
