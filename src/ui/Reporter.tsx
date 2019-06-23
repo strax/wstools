@@ -10,6 +10,7 @@ export interface ReporterProps {
   finishedTasks: Array<ExecutionSummary>
   runningTasks: ReadonlySet<string>
   totalTasks: number
+  showSummary: boolean
 }
 
 export interface State {
@@ -68,7 +69,7 @@ export class Reporter extends React.Component<ReporterProps, State> {
         </Box>
         <StdoutContext.Consumer>
           {({ stdout }) =>
-            stdout.isTTY && (
+            stdout.isTTY && this.props.showSummary && (
               <Box marginTop={1}>
                 <Color blue>
                   <Spinner type="dot" />

@@ -64,6 +64,7 @@ class WsrunCommand extends Command {
         finishedTasks={finishedTasks}
         runningTasks={runningTasks}
         totalTasks={totalTasks}
+        showSummary={!hasFailures()}
       />
     )
     const ui = Ink.render(mkUI())
@@ -118,8 +119,6 @@ class WsrunCommand extends Command {
 
     if (!hasFailures()) {
       render(<SuccessSummary elapsedTime={timer()} taskCount={totalTasks} />)
-    } else {
-      render(<FailureSummary failure={finishedTasks.find(_ => !_.succeeded)!} />)
     }
     ui.unmount()
     await ui.waitUntilExit()
