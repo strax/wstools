@@ -5,7 +5,7 @@ import { ExecutionSummary } from "../runner"
 import { Timer } from "../Timer"
 import { showSeconds } from "./showTime"
 
-export interface UIProps {
+export interface ReporterProps {
   timer: Timer
   finishedTasks: Array<ExecutionSummary>
   runningTasks: ReadonlySet<string>
@@ -37,7 +37,7 @@ const TaskResultView: React.SFC<{ data: ExecutionSummary }> = ({ data }) => {
   }
 }
 
-export class UI extends React.Component<UIProps, State> {
+export class Reporter extends React.Component<ReporterProps, State> {
   private interval!: NodeJS.Timeout
 
   state: State = { currentTime: 0 }

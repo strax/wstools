@@ -12,7 +12,7 @@ import { ExecutionSummary, runScript } from "../runner"
 import { Timer } from "../Timer"
 import { FailureSummary } from "../ui/FailureSummary"
 import { SuccessSummary } from "../ui/SuccessSummary"
-import { UI } from "../ui/UI"
+import { Reporter } from "../ui/Reporter"
 import * as Yarn from "../yarn"
 
 const WORKER_COUNT = cpus().length
@@ -59,7 +59,7 @@ class WsrunCommand extends Command {
     const barrier = new AsyncCountdownEvent(0)
 
     const mkUI = () => (
-      <UI
+      <Reporter
         timer={timer}
         finishedTasks={finishedTasks}
         runningTasks={runningTasks}
