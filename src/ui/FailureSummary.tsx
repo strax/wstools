@@ -5,8 +5,8 @@ import { ExecutionSummary } from "../runner"
 export const FailureSummary: React.FC<{ failure: ExecutionSummary }> = ({ failure }) => (
   <Box flexDirection="column">
     <Box>
-      <Color red>{failure.workspace}</Color>: Command '{failure.command}' failed.
+      <Color red>{failure.workspace.name}</Color>: Command '{failure.command}' failed.
     </Box>
-    <Box>{failure.stderr!.trimEnd()}</Box>
+    <Box>{failure.output.trimEnd()}</Box>
   </Box>
 )

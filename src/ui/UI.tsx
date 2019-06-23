@@ -20,7 +20,7 @@ const TaskResultView: React.SFC<{ data: ExecutionSummary }> = ({ data }) => {
   if (data.succeeded) {
     return (
       <Box>
-        <Color greenBright>{data.workspace}</Color>:{" "}
+        <Color greenBright>{data.workspace.name}</Color>:{" "}
         <Box textWrap="truncate-end">{data.command}</Box>{" "}
         <Color dim>({data.duration.toFixed(0)}ms)</Color>
       </Box>
@@ -29,9 +29,9 @@ const TaskResultView: React.SFC<{ data: ExecutionSummary }> = ({ data }) => {
     return (
       <Box flexDirection="column">
         <Box>
-          <Color red>{data.workspace}</Color>: <Box textWrap="truncate-end">{data.command}</Box>
+          <Color red>{data.workspace.name}</Color>: <Box textWrap="truncate-end">{data.command}</Box>
         </Box>
-        {data.stderr && <Text>{data.stderr}</Text>}
+        {data.output && <Text>{data.output}</Text>}
       </Box>
     )
   }
@@ -62,7 +62,7 @@ export class UI extends React.Component<UIProps, State> {
         <Box flexDirection="column">
           <Static>
             {this.props.finishedTasks.map(summary => (
-              <TaskResultView data={summary} key={summary.workspace} />
+              <TaskResultView data={summary} key={summary.workspace.name} />
             ))}
           </Static>
         </Box>

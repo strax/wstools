@@ -13,11 +13,3 @@ export function repeat(n: number, fn: (i: number) => void) {
     fn(i)
   }
 }
-
-export function* indexed<A>(as: Iterable<A>): Iterable<[number, A]> {
-  let i = 0
-  for (const a of as) {
-    yield [i, a]
-    i++
-  }
-}
