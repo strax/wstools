@@ -73,10 +73,13 @@ class WsrunCommand extends Command {
       return finishedTasks.some(summary => !summary.succeeded)
     }
 
-    const execution = CancelToken.source()
-    const executor = new AsyncExecutor(WORKER_COUNT, execution)
+    const supervisor = CancelToken.source()
+    const executor = new AsyncExecutor(WORKER_COUNT, supervisor)
 
     function onSuccess(summary: ExecutionSummary) {
+      if (!summary.succeeded) {
+        supervisor.cancel()
+      }
       runningTasks.delete(summary.workspace.name)
       finishedTasks.push(summary)
       barrier.signal()
@@ -85,22 +88,20 @@ class WsrunCommand extends Command {
     function onFailure(task: RunScriptTask, error: Error) {
       runningTasks.delete(task.workspace.name)
       barrier.signal()
-      if (error instanceof CancelError) {
-        return
+      if (!(error instanceof CancelError)) {
+        finishedTasks.push({
+          command: task.script,
+          workspace: task.workspace,
+          duration: 0,
+          output: error.message,
+          succeeded: false
+        })
+        supervisor.cancel()
       }
-      const summary = {
-        command: task.script,
-        workspace: task.workspace,
-        duration: 0,
-        output: error.message,
-        succeeded: false
-      }
-      finishedTasks.push(summary)
-      execution.cancel()
     }
 
     for (const group of groups) {
-      if (execution.token.signaled) {
+      if (supervisor.token.signaled) {
         break
       }
       barrier.reset(group.size)
