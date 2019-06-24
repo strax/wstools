@@ -2,6 +2,7 @@ import { readManifest } from "./manifest"
 import { exec } from "./Process"
 import { ProcessError } from "./ProcessError"
 import { Timer } from "./Timer"
+import Path from "path"
 
 export interface ExecutionSummary {
   workspace: Workspace
@@ -9,6 +10,10 @@ export interface ExecutionSummary {
   succeeded: boolean
   output: string
   duration: number
+}
+
+function binPath(base: string) {
+  return Path.join(base, "node_modules", ".bin")
 }
 
 export async function runScript(
@@ -29,7 +34,7 @@ export async function runScript(
   try {
     const output = await exec([command, ...args].join(" "), {
       cwd: workspace.path,
-      env: process.env
+      env: { ...process.env, PATH: [binPath(workspace.path), binPath(process.cwd()), process.env.PATH].join(":") }
     }).promise()
     const duration = timer()
     return {
