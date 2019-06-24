@@ -1,4 +1,4 @@
-import { AsyncCountdownEvent, CancelToken, CancelError } from "@esfx/async"
+import { AsyncCountdownEvent, CancelError, CancelToken } from "@esfx/async"
 import { Command, flags as CommandFlags } from "@oclif/command"
 import * as Errors from "@oclif/errors"
 import * as F from "fluture"
@@ -10,9 +10,8 @@ import { AsyncExecutor } from "../Executor"
 import { partition } from "../graph"
 import { ExecutionSummary, runScript } from "../runner"
 import { Timer } from "../Timer"
-import { FailureSummary } from "../ui/FailureSummary"
-import { SuccessSummary } from "../ui/SuccessSummary"
 import { Reporter } from "../ui/Reporter"
+import { SuccessSummary } from "../ui/SuccessSummary"
 import * as Yarn from "../yarn"
 
 const WORKER_COUNT = cpus().length
@@ -51,7 +50,9 @@ class WsrunCommand extends Command {
     const timer = Timer()
     const { args, flags } = this.parse(WsrunCommand)
     const workspaces = await Yarn.findWorkspaces(process.cwd())
-    const groups = flags.unordered ? [new Set(workspaces)] : partition(workspaces, ws => ws.dependencies)
+    const groups = flags.unordered
+      ? [new Set(workspaces)]
+      : partition(workspaces, ws => ws.dependencies)
     const totalTasks = workspaces.length
     const finishedTasks: Array<ExecutionSummary> = []
     const runningTasks: Set<string> = new Set()
