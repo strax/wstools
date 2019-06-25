@@ -12,6 +12,19 @@ So far, `wstools` contains two (usable) commands: [wsrun](#wsrun) and [wsviz](#w
 It builds a dependency graph from the workspace and ensures a workspace is built only after its dependencies.
 The current state of the tool does not allow customizing the amount of parallel tasks but rather is fixed to `n - 1` where `n` is the amount of the cores available in the machine.
 
+#### Usage
+```
+USAGE
+  $ wstools SCRIPT
+
+ARGUMENTS
+  SCRIPT  The package.json script to run in each workspace
+
+OPTIONS
+  -u, --unordered  Execute workspaces in parallel without generating a dependency graph
+  --help           show CLI help
+```
+
 ### `wsviz`
 
 `wzviz` generates [DOT](https://en.wikipedia.org/wiki/DOT_(graph_description_language)) markup for the current workspace's execution graph.
