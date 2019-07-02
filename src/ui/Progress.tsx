@@ -7,7 +7,6 @@ import { Elapsed } from "./Elapsed"
 interface Props {
   finishedTasksCount: number
   totalTaskCount: number
-  runningTasks: Iterable<string>
   timer: Timer
 }
 
@@ -16,7 +15,6 @@ export const Progress: React.FC<Props> = props => (
     <Color blue>
       <Spinner type="dot" />
     </Color>{" "}
-    Progress: {props.finishedTasksCount}/{props.totalTaskCount} Running:{" "}
-    {Array.from(props.runningTasks).join(", ")} (<Elapsed timer={props.timer} />)
+    Progress: {props.finishedTasksCount}/{props.totalTaskCount} (<Elapsed timer={props.timer} />)
   </Box>
 )

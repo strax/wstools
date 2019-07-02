@@ -55,7 +55,6 @@ class WsrunCommand extends Command {
       : partition(workspaces, ws => ws.dependencies)
     const totalTasks = workspaces.length
     const finishedTasks: Array<ExecutionSummary> = []
-    const runningTasks: Set<string> = new Set()
     const { script } = args
     const barrier = new AsyncCountdownEvent(0)
 
@@ -63,7 +62,6 @@ class WsrunCommand extends Command {
       <Reporter
         timer={timer}
         finishedTasks={finishedTasks}
-        runningTasks={runningTasks}
         totalTasks={totalTasks}
         showSummary={!hasFailures()}
       />
@@ -82,13 +80,11 @@ class WsrunCommand extends Command {
       if (!summary.succeeded) {
         supervisor.cancel()
       }
-      runningTasks.delete(summary.workspace.name)
       finishedTasks.push(summary)
       barrier.signal()
     }
 
     function onFailure(task: RunScriptTask, error: Error) {
-      runningTasks.delete(task.workspace.name)
       barrier.signal()
       if (!(error instanceof CancelError)) {
         finishedTasks.push({
@@ -109,12 +105,16 @@ class WsrunCommand extends Command {
       barrier.reset(group.size)
       for (const workspace of group) {
         const task: RunScriptTask = { workspace, script, args: [] }
-        executor
-          .schedule(mkRunScriptTask(task))
-          .then(onSuccess, error => onFailure(task, error))
-          .finally(() => render())
-        runningTasks.add(workspace.name)
-        render()
+        process.nextTick(async () => {
+          try {
+            const summary = await executor.schedule(mkRunScriptTask(task))
+            onSuccess(summary)
+          } catch (error) {
+            onFailure(task, error)
+          } finally {
+            render()
+          }
+        })
       }
       await barrier.wait()
     }

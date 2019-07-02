@@ -8,7 +8,6 @@ import { TTY } from "./TTY"
 export interface ReporterProps {
   timer: Timer
   finishedTasks: Array<ExecutionSummary>
-  runningTasks: ReadonlySet<string>
   totalTasks: number
   showSummary: boolean
 }
@@ -50,7 +49,6 @@ export const Reporter: React.FC<ReporterProps> = props => {
           <Progress
             finishedTasksCount={props.finishedTasks.length}
             totalTaskCount={props.totalTasks}
-            runningTasks={props.runningTasks}
             timer={props.timer}
           />
         </TTY>
