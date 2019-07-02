@@ -22,7 +22,10 @@ export class BufferingSink extends Writable {
     })
   }
 
-  intoBuffer(): Buffer {
+  get buffered(): Buffer {
+    if (this.writable) {
+      throw new Error("cannot extract data from stream still in use")
+    }
     return Buffer.concat(this.chunks)
   }
 }

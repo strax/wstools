@@ -3,6 +3,7 @@ import { exec } from "./Process"
 import { ProcessError } from "./ProcessError"
 import { Timer } from "./Timer"
 import Path from "path"
+import { BufferingSink } from "./BufferingSink";
 
 export interface ExecutionSummary {
   workspace: Workspace
@@ -31,16 +32,19 @@ export async function runScript(
   }
   // stdout.writeLine(chalk.blue(workspace.name + ":") + " " + [command, ...args].join(" "))
   const timer = Timer()
+
+  const output = new BufferingSink()
   try {
-    const output = await exec([command, ...args].join(" "), {
+    await exec([command, ...args].join(" "), {
       cwd: workspace.path,
+      output,
       env: { ...process.env, PATH: [binPath(workspace.path), binPath(process.cwd()), process.env.PATH].join(":") }
     }).promise()
     const duration = timer()
     return {
       workspace,
       command: [command, ...args].join(" "),
-      output: output.toString("utf-8"),
+      output: output.buffered.toString("utf-8"),
       succeeded: true,
       duration
     }
@@ -51,7 +55,7 @@ export async function runScript(
         command: [command, ...args].join(" "),
         succeeded: false,
         duration: timer(),
-        output: err.output
+        output: output.buffered.toString("utf-8")
       }
     } else {
       throw err

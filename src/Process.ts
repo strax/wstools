@@ -3,22 +3,30 @@ import { SpawnOptions } from "child_process"
 import { FutureInstance as Future, Future as future } from "fluture"
 import { spawn } from "child_process"
 import { BufferingSink } from "./BufferingSink";
+import { Writable } from "stream";
 
-export function exec(command: string, opts: SpawnOptions = {}): Future<Error, Buffer> {
+export interface ExecOptions {
+  cwd?: string
+  env?: NodeJS.ProcessEnv
+  output?: Writable
+}
+
+export function exec(command: string, { env, cwd, output }: ExecOptions = {}): Future<Error, number> {
   return future((reject, resolve) => {
-    const proc = spawn(command, { ...opts, stdio: "pipe", shell: true })
+    const proc = spawn(command, { stdio: "pipe", shell: true, env, cwd })
 
-    // Combine output to a single stream
-    const output = new BufferingSink()
-    proc.stdout.pipe(output)
-    proc.stderr.pipe(output)
+    if (output) {
+      proc.stdout.pipe(output, { end: false })
+      proc.stderr.pipe(output, { end: false })
+    }
 
     proc.addListener("error", error => reject(error))
     proc.addListener("close", code => {
+      if (output) output.end()
       if (code !== 0) {
-        reject(new ProcessError(`Process exited with status code ${code}`, code, (output.intoBuffer()).toString("utf-8")))
+        reject(new ProcessError(`Process exited with status code ${code}`, code))
       } else {
-        resolve(output.intoBuffer())
+        resolve(code)
       }
     })
 

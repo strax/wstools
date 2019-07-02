@@ -1,5 +1,5 @@
 export class ProcessError extends Error {
-  constructor(message: string, readonly code: number, readonly output: string) {
+  constructor(message: string, readonly code: number) {
     super(message)
   }
 }
