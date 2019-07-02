@@ -1,9 +1,9 @@
-import { Box, Color, Static, StdoutContext, Text } from "ink"
-import Spinner from "ink-spinner"
+import { Box, Color, Static, Text } from "ink"
 import React from "react"
 import { ExecutionSummary } from "../runner"
 import { Timer } from "../Timer"
-import { showSeconds } from "./showTime"
+import { Progress } from "./Progress"
+import { TTY } from "./TTY"
 
 export interface ReporterProps {
   timer: Timer
@@ -11,10 +11,6 @@ export interface ReporterProps {
   runningTasks: ReadonlySet<string>
   totalTasks: number
   showSummary: boolean
-}
-
-export interface State {
-  currentTime: number
 }
 
 const TaskResultView: React.SFC<{ data: ExecutionSummary }> = ({ data }) => {
@@ -30,7 +26,8 @@ const TaskResultView: React.SFC<{ data: ExecutionSummary }> = ({ data }) => {
     return (
       <Box flexDirection="column">
         <Box>
-          <Color red>{data.workspace.name}</Color>: <Box textWrap="truncate-end">{data.command}</Box>
+          <Color red>{data.workspace.name}</Color>:{" "}
+          <Box textWrap="truncate-end">{data.command}</Box>
         </Box>
         {data.output && <Text>{data.output}</Text>}
       </Box>
@@ -38,50 +35,26 @@ const TaskResultView: React.SFC<{ data: ExecutionSummary }> = ({ data }) => {
   }
 }
 
-export class Reporter extends React.Component<ReporterProps, State> {
-  private interval!: NodeJS.Timeout
-
-  state: State = { currentTime: 0 }
-
-  componentDidMount() {
-    this.interval = setInterval(
-      () =>
-        this.setState({
-          currentTime: this.props.timer()
-        }),
-      150
-    )
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.interval)
-  }
-
-  render() {
-    return (
-      <>
-        <Box flexDirection="column">
-          <Static>
-            {this.props.finishedTasks.map(summary => (
-              <TaskResultView data={summary} key={summary.workspace.name} />
-            ))}
-          </Static>
-        </Box>
-        <StdoutContext.Consumer>
-          {({ stdout }) =>
-            stdout.isTTY && this.props.showSummary && (
-              <Box marginTop={1}>
-                <Color blue>
-                  <Spinner type="dot" />
-                </Color>{" "}
-                Progress: {this.props.finishedTasks.length}/{this.props.totalTasks} Running:{" "}
-                {Array.from(this.props.runningTasks).join(", ")} (
-                {showSeconds(this.state.currentTime)}s)
-              </Box>
-            )
-          }
-        </StdoutContext.Consumer>
-      </>
-    )
-  }
+export const Reporter: React.FC<ReporterProps> = props => {
+  return (
+    <>
+      <Box flexDirection="column">
+        <Static>
+          {props.finishedTasks.map(summary => (
+            <TaskResultView data={summary} key={summary.workspace.name} />
+          ))}
+        </Static>
+      </Box>
+      {props.showSummary && (
+        <TTY>
+          <Progress
+            finishedTasksCount={props.finishedTasks.length}
+            totalTaskCount={props.totalTasks}
+            runningTasks={props.runningTasks}
+            timer={props.timer}
+          />
+        </TTY>
+      )}
+    </>
+  )
 }

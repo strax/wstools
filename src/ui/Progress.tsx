@@ -1,0 +1,22 @@
+import { Box, Color } from "ink"
+import Spinner from "ink-spinner"
+import React from "react"
+import { Timer } from "../Timer"
+import { Elapsed } from "./Elapsed"
+
+interface Props {
+  finishedTasksCount: number
+  totalTaskCount: number
+  runningTasks: Iterable<string>
+  timer: Timer
+}
+
+export const Progress: React.FC<Props> = props => (
+  <Box marginTop={1}>
+    <Color blue>
+      <Spinner type="dot" />
+    </Color>{" "}
+    Progress: {props.finishedTasksCount}/{props.totalTaskCount} Running:{" "}
+    {Array.from(props.runningTasks).join(", ")} (<Elapsed timer={props.timer} />)
+  </Box>
+)

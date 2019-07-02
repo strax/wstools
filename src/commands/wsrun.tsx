@@ -114,6 +114,7 @@ class WsrunCommand extends Command {
           .then(onSuccess, error => onFailure(task, error))
           .finally(() => render())
         runningTasks.add(workspace.name)
+        render()
       }
       await barrier.wait()
     }
