@@ -4,8 +4,7 @@
   "description": "Tools for working with Yarn workspaces",
   "bin": {
     "wsviz": "./bin/wsviz",
-    "wsrun": "./bin/wsrun",
-    "wsbuild": "./bin/wsbuild"
+    "wsrun": "./bin/wsrun"
   },
   "repository": {
     "type": "git",
