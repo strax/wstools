@@ -22,7 +22,6 @@ export function exec(command: string, { env, cwd, output }: ExecOptions = {}): F
 
     proc.addListener("error", error => reject(error))
     proc.addListener("close", code => {
-      if (output) output.end()
       if (code !== 0) {
         reject(new ProcessError(`Process exited with status code ${code}`, code))
       } else {
