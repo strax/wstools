@@ -1,58 +1,73 @@
 import { Box, Color, Static, Text } from "ink"
 import React from "react"
-import { ExecutionSummary } from "../runner"
+import { FailureTaskState, State, SuccessTaskState, TaskState, RunningTaskState } from "../TaskState"
 import { Timer } from "../Timer"
 import { Progress } from "./Progress"
 import { TTY } from "./TTY"
+import { Elapsed } from "./Elapsed";
 
 export interface ReporterProps {
   timer: Timer
-  finishedTasks: Array<ExecutionSummary>
-  totalTasks: number
+  tasks: Array<TaskState>
   showSummary: boolean
 }
 
-const TaskResultView: React.SFC<{ data: ExecutionSummary }> = ({ data }) => {
-  if (data.succeeded) {
+const TaskResultView: React.SFC<{ state: SuccessTaskState | FailureTaskState }> = ({ state }) => {
+  if (state.state === State.Success) {
     return (
       <Box>
-        <Color greenBright>{data.workspace.name}</Color>:{" "}
-        <Box textWrap="truncate-end">{data.command}</Box>{" "}
-        <Color dim>({data.duration.toFixed(0)}ms)</Color>
+        {state.workspace.name}: <Color green>success</Color> ({state.duration.toFixed(0)}ms)
       </Box>
     )
   } else {
     return (
       <Box flexDirection="column">
         <Box>
-          <Color red>{data.workspace.name}</Color>:{" "}
-          <Box textWrap="truncate-end">{data.command}</Box>
+          <Color red>{state.workspace.name}: failure</Color>
         </Box>
-        {data.output && <Text>{data.output}</Text>}
+        <Text>{state.output}</Text>
       </Box>
     )
   }
 }
 
+function isFinished(task: TaskState): task is SuccessTaskState | FailureTaskState {
+  return task.state === State.Success || task.state === State.Failure
+}
+
+function isRunning(task: TaskState): task is RunningTaskState {
+  return task.state === State.Running
+}
 export const Reporter: React.FC<ReporterProps> = props => {
+  const finishedTasks = props.tasks.filter(isFinished)
+  const runningTasks = props.tasks.filter(isRunning)
   return (
     <>
       <Box flexDirection="column">
         <Static>
-          {props.finishedTasks.map(summary => (
-            <TaskResultView data={summary} key={summary.workspace.name} />
+          {finishedTasks.map((state, i) => (
+            <TaskResultView state={state} key={i} />
           ))}
         </Static>
       </Box>
-      {props.showSummary && (
-        <TTY>
+      <TTY>
+        <Box flexDirection="column">
+          {runningTasks.map(state => (
+            <Box flexDirection="column" key={state.workspace.name}>
+              <Box>
+                {state.workspace.name}: <Color dim>running (<Elapsed timer={state.timer} />)</Color>
+              </Box>
+            </Box>
+          ))}
+        </Box>
+        {props.showSummary && (
           <Progress
-            finishedTasksCount={props.finishedTasks.length}
-            totalTaskCount={props.totalTasks}
+            finishedTasksCount={finishedTasks.length}
+            totalTaskCount={props.tasks.length}
             timer={props.timer}
           />
-        </TTY>
-      )}
+        )}
+      </TTY>
     </>
   )
 }

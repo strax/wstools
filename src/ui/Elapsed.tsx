@@ -31,7 +31,7 @@ export class Elapsed extends React.Component<Props, State> {
   }
 
   componentWillUnmount() {
-    this.timeout.unref()
+    clearInterval(this.timeout)
   }
 
   render() {
