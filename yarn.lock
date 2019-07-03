@@ -494,9 +494,9 @@ escape-string-regexp@^1.0.5:
   integrity sha1-G2HAViGQqN/2rjuyzwIAyhMLhtQ=
 
 fluture@^11.0.1:
-  version "11.0.1"
-  resolved "https://registry.yarnpkg.com/fluture/-/fluture-11.0.1.tgz#e7b0dace991bbe9670e73aa35cd170147ae00f4b"
-  integrity sha512-3sLKXzScs6mQByQefKrlJ4D6dPPIIcy6yvDivnUzs4GNxaKBLAQu9vxkZ9WQpFb7BuhpQgS+sr6z/+f4KLGrOg==
+  version "11.0.2"
+  resolved "https://registry.yarnpkg.com/fluture/-/fluture-11.0.2.tgz#0605a3c18f0566c9ed4ceb77ccec476b27c70f2c"
+  integrity sha512-bPE4MYozgZ1cPbItZ0gFQI8qi1wBGFx67C/J0a62aLC7QfJNxZ7lFaOwfVkRfgwY9D+v0/1fA6PG8QRDc7BrKA==
   dependencies:
     concurrify "^1.1.1"
     sanctuary-show "^1.0.0"
