@@ -1,10 +1,17 @@
 import { Box, Color, Static, Text } from "ink"
 import React from "react"
-import { FailureTaskState, State, SuccessTaskState, TaskState, RunningTaskState } from "../TaskState"
+import {
+  FailureTaskState,
+  RunningTaskState,
+  State,
+  SuccessTaskState,
+  TaskState
+} from "../TaskState"
 import { Timer } from "../Timer"
+import { Elapsed } from "./Elapsed"
 import { Progress } from "./Progress"
 import { TTY } from "./TTY"
-import { Elapsed } from "./Elapsed";
+import { showSeconds, showMilliseconds } from "./showTime";
 
 export interface ReporterProps {
   timer: Timer
@@ -12,20 +19,31 @@ export interface ReporterProps {
   showSummary: boolean
 }
 
-const TaskResultView: React.SFC<{ state: SuccessTaskState | FailureTaskState }> = ({ state }) => {
+const TaskResultView: React.SFC<{
+  state: SuccessTaskState | FailureTaskState
+  maxNameWidth: number
+}> = ({ state, maxNameWidth }) => {
   if (state.state === State.Success) {
     return (
-      <Box>
-        {state.workspace.name}: <Color green>success</Color> ({state.duration.toFixed(0)}ms)
+      <Box flexDirection="row">
+        <Box flexBasis={maxNameWidth} marginRight={2}>{state.workspace.name}</Box>
+        <Box>
+          <Color green bold>success</Color> {state.duration > 1000 ? `${showSeconds(state.duration)}s` : `${showMilliseconds(state.duration)}ms`}
+        </Box>
       </Box>
     )
   } else {
     return (
       <Box flexDirection="column">
-        <Box>
-          <Color red>{state.workspace.name}: failure</Color>
+        <Box flexDirection="row">
+          <Color red>
+            <Box flexBasis={maxNameWidth} marginRight={2}>{state.workspace.name}</Box>
+            <Box><Color bold>failure</Color></Box>
+          </Color>
         </Box>
-        <Text>{state.output}</Text>
+        <Box marginTop={1}>
+          {state.output.trim()}
+        </Box>
       </Box>
     )
   }
@@ -41,12 +59,15 @@ function isRunning(task: TaskState): task is RunningTaskState {
 export const Reporter: React.FC<ReporterProps> = props => {
   const finishedTasks = props.tasks.filter(isFinished)
   const runningTasks = props.tasks.filter(isRunning)
+  const maxNameWidth = props.tasks
+    .map(_ => _.workspace.name.length)
+    .reduce((a, b) => Math.max(a, b))
   return (
     <>
       <Box flexDirection="column">
         <Static>
           {finishedTasks.map((state, i) => (
-            <TaskResultView state={state} key={i} />
+            <TaskResultView state={state} key={i} maxNameWidth={maxNameWidth} />
           ))}
         </Static>
       </Box>
@@ -54,8 +75,13 @@ export const Reporter: React.FC<ReporterProps> = props => {
         <Box flexDirection="column">
           {runningTasks.map(state => (
             <Box flexDirection="column" key={state.workspace.name}>
-              <Box>
-                {state.workspace.name}: <Color dim>running (<Elapsed timer={state.timer} />)</Color>
+              <Box flexDirection="row">
+                <Box flexBasis={maxNameWidth} marginRight={2}>{state.workspace.name}</Box>
+                <Box>
+                  <Color dim>
+                    running <Elapsed timer={state.timer} />
+                  </Color>
+                </Box>
               </Box>
             </Box>
           ))}
