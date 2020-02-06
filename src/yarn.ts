@@ -29,8 +29,7 @@ async function exec(command: string, options: { cwd?: string } = {}): Promise<st
 
 export async function workspacesInfo(cwd: string): Promise<WorkspaceInfoMap> {
   try {
-    const output = JSON.parse(await exec("yarn workspaces info --json", { cwd })) as LogOutput
-    const workspaceInfoMap = JSON.parse(output.data) as WorkspaceInfoMap
+    const workspaceInfoMap = JSON.parse(await exec("yarn workspaces info --json", { cwd })) as WorkspaceInfoMap
     return workspaceInfoMap
   } catch (err) {
     throw new Error(`failed to parse workspace info: ${(err as Error).message}`)
