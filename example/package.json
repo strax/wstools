@@ -1,0 +1,13 @@
+{
+  "name": "example",
+  "private": true,
+  "workspaces": [
+      "workspace-a",
+      "workspace-b",
+      "workspace-c",
+      "workspace-d"
+  ],
+  "devDependencies": {
+    "wstools": "file:.."
+  }
+}

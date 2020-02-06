@@ -1,0 +1,7 @@
+{
+  "name": "@example/workspace-a",
+  "version": "0.0.0",
+  "scripts": {
+      "build": "sleep 5"
+  }
+}

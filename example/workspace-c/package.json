@@ -1,0 +1,11 @@
+{
+    "name": "@example/workspace-c",
+    "version": "0.0.0",
+    "scripts": {
+      "build": "sleep 5"
+    },
+    "dependencies": {
+      "@example/workspace-a": "*"
+    }
+  }
+  
