@@ -227,12 +227,13 @@
     "@esfx/internal-guards" "^1.0.0-pre.6"
     tslib "^1.9.3"
 
-"@esfx/disposable@1.0.0-pre.8", "@esfx/disposable@^1.0.0-pre.8":
-  version "1.0.0-pre.8"
-  resolved "https://registry.yarnpkg.com/@esfx/disposable/-/disposable-1.0.0-pre.8.tgz#3f49872d7227c2e4338a978e9d688d8582927d55"
-  integrity sha512-4uPYpwuDnan7yCf4i5/psZwsGXfJhRP80wx4hWGt0jYDIivfPKV2e+hX1kcSsmM4D6at1z9Qig4Zb2LJuhm5cw==
+"@esfx/disposable@1.0.0-pre.13", "@esfx/disposable@^1.0.0-pre.8":
+  version "1.0.0-pre.13"
+  resolved "https://registry.yarnpkg.com/@esfx/disposable/-/disposable-1.0.0-pre.13.tgz#08415a2d8408a0035094f5b5aebd84b9c9333662"
+  integrity sha512-rTypmtVgC8nx3gfxHIX96By2UNub0ewRthxUiWE1x/+NTSfzGOHVpVu0H8DF+VQJND04E6srcwwbO+Hpek16GA==
   dependencies:
-    "@esfx/internal-guards" "^1.0.0-pre.6"
+    "@esfx/internal-deprecate" "^1.0.0-pre.13"
+    "@esfx/internal-guards" "^1.0.0-pre.11"
     "@esfx/internal-tag" "^1.0.0-pre.6"
     tslib "^1.9.3"
 
@@ -244,12 +245,19 @@
     "@esfx/internal-hashcode" "^1.0.0-pre.5"
     tslib "^1.9.3"
 
-"@esfx/internal-guards@^1.0.0-pre.6":
-  version "1.0.0-pre.6"
-  resolved "https://registry.yarnpkg.com/@esfx/internal-guards/-/internal-guards-1.0.0-pre.6.tgz#e4f42f12e0222995914700ffa80610f8cc2a7069"
-  integrity sha512-BHUioO3f/zURjNmTIgtVSnD9RNm+TUf7BYfvkF58xJtoO/ARkAU3n8ylwCT7g0ikoT2EheUAfU+6MVWXuWPwEw==
+"@esfx/internal-deprecate@^1.0.0-pre.13":
+  version "1.0.0-pre.13"
+  resolved "https://registry.yarnpkg.com/@esfx/internal-deprecate/-/internal-deprecate-1.0.0-pre.13.tgz#99f6434e9306b75f720e0ac5152757a4d7aa31ea"
+  integrity sha512-uF4EhrILmUJdcDkSQNsr+33XEKaMj92/8804VIHswytdbwaQjQ85dbj1bSB9TFsXG2zkZtJo09NKNQ9p7NvTPQ==
   dependencies:
-    "@esfx/type-model" "^1.0.0-pre.6"
+    tslib "^1.9.3"
+
+"@esfx/internal-guards@^1.0.0-pre.11", "@esfx/internal-guards@^1.0.0-pre.6":
+  version "1.0.0-pre.11"
+  resolved "https://registry.yarnpkg.com/@esfx/internal-guards/-/internal-guards-1.0.0-pre.11.tgz#7814b8c128e3b8dceaa0b065d419f41280e04133"
+  integrity sha512-DnRXkwwSrqIaml+sAm/zzpfDOCBnZkzflmGB833AqVYbgopO7xPBobngxqGBhYjutgTmVuXV3GKP0g08h4mQEw==
+  dependencies:
+    "@esfx/type-model" "^1.0.0-pre.11"
     tslib "^1.9.3"
 
 "@esfx/internal-hashcode@^1.0.0-pre.5":
@@ -279,10 +287,10 @@
   resolved "https://registry.yarnpkg.com/@esfx/internal-tag/-/internal-tag-1.0.0-pre.6.tgz#14fc9c539765ac76340474cce747965e19b51833"
   integrity sha512-nODidP9/RBLqX39HL12IhFLgaoBHrC5nrm6D/BwquCGNoPQI9EXNPau+IdmGqeUcaMoVOFLFOkYtnHU52RVngw==
 
-"@esfx/type-model@^1.0.0-pre.6":
-  version "1.0.0-pre.6"
-  resolved "https://registry.yarnpkg.com/@esfx/type-model/-/type-model-1.0.0-pre.6.tgz#4e06271c0d2eee8a1a0814794095fd71ab11b7a2"
-  integrity sha512-P6XiQ8fRixLJN9nmMw8/EXgrRubSYbF6o/9dIRdC9KTOzzRDMgwPCnun1uZ06Ulmetn8unvwUExIE9YsRntLeQ==
+"@esfx/type-model@^1.0.0-pre.11":
+  version "1.0.0-pre.11"
+  resolved "https://registry.yarnpkg.com/@esfx/type-model/-/type-model-1.0.0-pre.11.tgz#7cba18ae58623aa3a7c2ac0f14b0f6ffc462029b"
+  integrity sha512-ImM8fj0HFE2GRPRq+q1xnW3kNaIbZscpJfWjGyeo9KdMxKoI75bJebsA3XK6AH9zbEWba+521V+m6NDvDhcnSw==
   dependencies:
     tslib "^1.9.3"
 
