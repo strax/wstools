@@ -34,9 +34,9 @@ export function toposort<T>(vertices: Array<T>, adjacent: (vertex: T) => Iterabl
 export function partition<T>(
   vertices: Array<T>,
   edges: (vertex: T) => Iterable<T>
-): Iterable<Set<T>> {
+): Array<[Set<T>, Set<T>]> {
   const remaining = new Set<T>(vertices)
-  const series: Array<Set<T>> = []
+  const series: Array<[Set<T>, Set<T>]> = []
 
   function satisfied(v: T) {
     for (const u of edges(v)) {
@@ -52,9 +52,9 @@ export function partition<T>(
   }
 
   // TODO: Detect cycles, otherwise we'll loop forever
-  const leaves = new Set<T>()
   while (remaining.size > 0) {
     const group = new Set<T>()
+    const leaves = new Set<T>()
     for (const v of remaining) {
       if (satisfied(v) && indeg(v) > 0) {
         group.add(v)
@@ -66,8 +66,7 @@ export function partition<T>(
     for (const v of group) {
       remaining.delete(v)
     }
-    series.push(group)
+    series.push([group, leaves])
   }
-  series.push(leaves)
   return series
 }

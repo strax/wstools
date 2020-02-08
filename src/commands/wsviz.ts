@@ -18,7 +18,7 @@ async function main() {
 
   process.stdout.write(`
 digraph dependencies {
-  ${Array.from(series)
+  ${flatten(Array.from(series))
     .map(
       (workspaces, i) =>
         `subgraph {

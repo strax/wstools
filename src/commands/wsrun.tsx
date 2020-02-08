@@ -1,21 +1,43 @@
-import { AsyncCountdownEvent, CancelError, CancelToken } from "@esfx/async";
-import { Command, flags as CommandFlags } from "@oclif/command";
-import * as Errors from "@oclif/errors";
-import * as F from "fluture";
-import { attempt, FutureInstance as Future } from "fluture";
-import * as Ink from "ink";
-import { cpus } from "os";
-import React from "react";
-import { AsyncExecutor } from "../Executor";
-import { partition } from "../graph";
-import { runScript } from "../runner";
-import { FailureTaskState, State, SuccessTaskState, TaskState } from "../TaskState";
-import { Timer } from "../Timer";
-import { Reporter } from "../ui/Reporter";
-import { SuccessSummary } from "../ui/SuccessSummary";
-import * as Yarn from "../yarn";
+import { cpus } from "os"
+import { CancelError, CancelToken, AsyncCountdownEvent } from "@esfx/async"
+import { Command, flags as CommandFlags } from "@oclif/command"
+import * as Errors from "@oclif/errors"
+import * as F from "fluture"
+import { attempt, FutureInstance as Future } from "fluture"
+import * as Ink from "ink"
+import storage from "node-persist"
+import React from "react"
+import { AsyncExecutor } from "../Executor"
+import { FailureTaskState, State, SuccessTaskState, TaskState } from "../TaskState"
+import { Timer } from "../Timer"
+import { partition } from "../graph"
+import { runScript } from "../runner"
+import { Reporter } from "../ui/Reporter"
+import { SuccessSummary } from "../ui/SuccessSummary"
+import { calculateAveragesPerWorkspace, sort, sortGroupByAverageTimeDesc } from "../utils"
+import * as Yarn from "../yarn"
 
-const WORKER_COUNT = cpus().length - 1
+/**
+ * When you have a low amount of CPU cores, you want to have multiple threads per core if it is supported.
+ *
+ * When the core count gets higher the benefit or running multiple threads on the same core goes down,
+ * since it lowers the boost clock and hinders the performance of each thread.
+ *
+ * So when the core count gets higher, you want to run only on the physical cores.
+ *
+ * This is a naive function that determines the worker count based on the "cpus" available.
+ * The length of cpus is actually the number of threads the CPU can run.
+ */
+function getWorkerCount(maximumParallelism: boolean, threads?: number) {
+  if (threads && Number.isInteger(threads)) {
+    return threads
+  }
+  const threadCount = cpus().length
+  if (maximumParallelism) {
+    return threadCount - 1
+  }
+  return threadCount / 2
+}
 
 interface RunScriptTask {
   script: string
@@ -44,20 +66,47 @@ class WsrunCommand extends Command {
       default: false,
       description: "Execute workspaces in parallel without generating a dependency graph"
     }),
-    help: CommandFlags.help()
+    help: CommandFlags.help(),
+    learn: CommandFlags.boolean({
+      char: "l",
+      default: false,
+      description: "Teach the tool to optimize building order"
+    }),
+    maximumParallelism: CommandFlags.boolean({
+      char: "p",
+      default: false,
+      description:
+        "Maximize parallel build count. Depends on the CPU if this is a good option or not, you should test if it makes your build faster."
+    }),
+    threadCount: CommandFlags.integer({
+      char: "t",
+      default: undefined,
+      description:
+        "Amount of threads to use for task running. Maximum amount of parallel tasks that can run."
+    }),
+    alternateOrder: CommandFlags.boolean({
+      char: "o",
+      default: false,
+      description:
+        "By default non-blocking workspaces are build fastest first while there are still blocking workspaces left. This alters the order to be slowest first."
+    })
   }
 
   async run() {
     const timer = Timer()
     const { args, flags } = this.parse(WsrunCommand)
+    const WORKER_COUNT = getWorkerCount(flags.maximumParallelism, flags.threadCount)
     const workspaces = await Yarn.findWorkspaces(process.cwd())
     const groups = flags.unordered
-      ? [new Set(workspaces)]
+      ? [[new Set(workspaces), new Set<Workspace>()]]
       : partition(workspaces, ws => ws.dependencies)
     const totalTasks = workspaces.length
     const tasks: Map<string, TaskState> = new Map()
     const { script } = args
-    const barrier = new AsyncCountdownEvent(0)
+    const jobBarrier = new AsyncCountdownEvent(workspaces.length)
+    const groupBarrier = new AsyncCountdownEvent(0)
+    await storage.init()
+    const averageTimePerWorkspace = await calculateAveragesPerWorkspace(workspaces, storage, script)
 
     for (const workspace of workspaces) {
       tasks.set(workspace.name, { state: State.Pending, workspace })
@@ -83,7 +132,7 @@ class WsrunCommand extends Command {
     }
 
     function onStarted(workspace: Workspace) {
-      return function <L, R>(future: Future<L, R>): Future<L, R> {
+      return function<L, R>(future: Future<L, R>): Future<L, R> {
         return attempt<L, void>(() => {
           const timer = Timer()
           updateState(workspace, {
@@ -95,16 +144,27 @@ class WsrunCommand extends Command {
       }
     }
 
-    function onSuccess(state: SuccessTaskState | FailureTaskState) {
+    async function onSuccess(state: SuccessTaskState | FailureTaskState, primary = true) {
       if (state.state === State.Failure) {
         supervisor.cancel()
       }
+      if (flags.learn) {
+        const times: number[] = (await storage.get(script + state.workspace.name)) || []
+        await storage.set(script + state.workspace.name, [
+          // Filter out builds that hang for various reasons i.e. closing the laptop lid
+          ...times.filter(t => t < 1000 * 60 * 10),
+          state.duration
+        ])
+      }
       updateState(state.workspace, state)
-      barrier.signal()
+      jobBarrier.signal()
+      if (primary) {
+        groupBarrier.signal()
+      }
     }
 
     function onFailure(task: RunScriptTask, error: Error) {
-      barrier.signal()
+      jobBarrier.signal()
       if (!(error instanceof CancelError)) {
         updateState(task.workspace, {
           state: State.Failure,
@@ -121,24 +181,57 @@ class WsrunCommand extends Command {
       }
     }
 
-    for (const group of groups) {
+    async function runTask(workspace: Workspace, primary = true) {
+      const task: RunScriptTask = { workspace, script, args: [] }
+      try {
+        const status = await executor.schedule(mkRunScriptTask(task).pipe(onStarted(workspace)))
+        onSuccess(status, primary)
+      } catch (error) {
+        onFailure(task, error)
+      }
+    }
+
+    let unprocessedLeaves = new Array<Workspace>()
+    function sortWorkgroups(group: Set<Workspace>, leaves: Set<Workspace>, lastLoop: boolean) {
+      if (lastLoop) {
+        unprocessedLeaves = []
+        const combinedWorkgroups = Array(...leaves)
+          .concat(Array(...group))
+          .concat(unprocessedLeaves)
+        return sort(combinedWorkgroups, averageTimePerWorkspace)
+      }
+      const combinedLeaves = Array(...leaves).concat(unprocessedLeaves)
+      unprocessedLeaves = sort(combinedLeaves, averageTimePerWorkspace, flags.alternateOrder)
+      return sortGroupByAverageTimeDesc(group, averageTimePerWorkspace)
+    }
+
+    // We want to handle slowest blocking workspaces first, and while we wait
+    // we want to handle fastest non-blocking workspaces. When we have processed
+    // all the blocking workspaces, we want to handle all remaining non-blocking
+    // workspaces slowest first
+    for (let i = 0; i < groups.length; i++) {
       if (supervisor.token.signaled) {
+        // barrier.reset(0)
         break
       }
-      barrier.reset(group.size)
-      for (const workspace of group) {
-        const task: RunScriptTask = { workspace, script, args: [] }
-        process.nextTick(async () => {
-          try {
-            const status = await executor.schedule(mkRunScriptTask(task).pipe(onStarted(workspace)))
-            onSuccess(status)
-          } catch (error) {
-            onFailure(task, error)
-          }
-        })
+      const [group, leaves] = groups[i]
+      const lastLoop = i + 1 === groups.length
+      const sortedGroup = sortWorkgroups(group, leaves, lastLoop)
+      groupBarrier.reset(sortedGroup.length)
+      for (const workspace of sortedGroup) {
+        runTask(workspace)
       }
-      await barrier.wait()
+      while (groupBarrier.remainingCount > 0 && unprocessedLeaves.length > 0) {
+        await executor.wait()
+        // Always give group workspaces precedence
+        if (groupBarrier.remainingCount > 0) {
+          const workspace = unprocessedLeaves.shift()!
+          runTask(workspace, false)
+        }
+      }
+      await groupBarrier.wait()
     }
+    await jobBarrier.wait()
 
     if (!hasFailures()) {
       render(<SuccessSummary elapsedTime={timer()} taskCount={totalTasks} />)
