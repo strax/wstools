@@ -28,10 +28,12 @@
     "fluture": "^11.0.1",
     "ink": "2.3.0",
     "ink-spinner": "3.0.1",
+    "node-persist": "^3.0.5",
     "react": "16.8.6"
   },
   "devDependencies": {
     "@types/node": "13.7.0",
+    "@types/node-persist": "^3.0.0",
     "@types/yargs": "15.0.3",
     "typescript": "3.7.5"
   },
