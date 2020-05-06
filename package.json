@@ -20,7 +20,7 @@
   "dependencies": {
     "@esfx/async": "1.0.0-pre.8",
     "@esfx/disposable": "1.0.0-pre.8",
-    "@oclif/command": "1.5.14",
+    "@oclif/command": "1.6.1",
     "@oclif/config": "1.13.0",
     "@oclif/errors": "1.2.2",
     "@oclif/plugin-help": "2.2.0",
