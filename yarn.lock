@@ -463,14 +463,6 @@ color-name@1.1.3:
   resolved "https://registry.yarnpkg.com/color-name/-/color-name-1.1.3.tgz#a7d0558bd89c42f795dd42328f740831ca53bc25"
   integrity sha1-p9BVi9icQveV3UIyj3QIMcpTvCU=
 
-concurrify@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/concurrify/-/concurrify-1.1.1.tgz#e903b6500b2ce9af7ac51bd5f2161f8db33cfb41"
-  integrity sha512-m2UMqZAJ7Ys4Juu0IaToa/RbVuu5jR8dGVrwUOeQtfJjX0KDimUdPZ20tVrdSuqJwLaFbpI+lWxOmZSYxyCvmQ==
-  dependencies:
-    sanctuary-show "^1.0.0"
-    sanctuary-type-identifiers "^2.0.0"
-
 csstype@^2.2.0:
   version "2.6.5"
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-2.6.5.tgz#1cd1dff742ebf4d7c991470ae71e12bb6751e034"
@@ -493,14 +485,13 @@ escape-string-regexp@^1.0.5:
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz#1b61c0562190a8dff6ae3bb2cf0200ca130b86d4"
   integrity sha1-G2HAViGQqN/2rjuyzwIAyhMLhtQ=
 
-fluture@^11.0.1:
-  version "11.0.1"
-  resolved "https://registry.yarnpkg.com/fluture/-/fluture-11.0.1.tgz#e7b0dace991bbe9670e73aa35cd170147ae00f4b"
-  integrity sha512-3sLKXzScs6mQByQefKrlJ4D6dPPIIcy6yvDivnUzs4GNxaKBLAQu9vxkZ9WQpFb7BuhpQgS+sr6z/+f4KLGrOg==
+fluture@^13.0.1:
+  version "13.0.1"
+  resolved "https://registry.yarnpkg.com/fluture/-/fluture-13.0.1.tgz#2026944079d0c2324949988af15e131d226d7f46"
+  integrity sha512-AhYpO5ZCsy781dtCW3XQH1XOasshr7+zn8aREWZq5FobkqVYp7EXBQnRpY/Rwf6Z4A+BLlOmW8T9U9yacDPppw==
   dependencies:
-    concurrify "^1.1.1"
-    sanctuary-show "^1.0.0"
-    sanctuary-type-identifiers "^2.0.0"
+    sanctuary-show "^2.0.0"
+    sanctuary-type-identifiers "^3.0.0"
 
 fs-extra@^7.0.0:
   version "7.0.1"
@@ -687,15 +678,15 @@ restore-cursor@^2.0.0:
     onetime "^2.0.0"
     signal-exit "^3.0.2"
 
-sanctuary-show@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/sanctuary-show/-/sanctuary-show-1.0.0.tgz#72deb4812f9decec850e03286807dca1c97a1d61"
-  integrity sha512-63UqNGr5M6wkzKp6eGc/Gy6JBIV2PbzPd3q88+0F9z0qydAQsCWJ+7e4oor39rEEwj2GkZMDEhqGuiMl9eEnYw==
+sanctuary-show@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/sanctuary-show/-/sanctuary-show-2.0.0.tgz#2326b4744f4b0f993f18ca56a29f68a50f514637"
+  integrity sha512-REj4ZiioUXnDLj6EpJ9HcYDIEGaEexmB9Fg5o6InZR9f0x5PfnnC21QeU9SZ9E7G8zXSZPNjy8VRUK4safbesw==
 
-sanctuary-type-identifiers@^2.0.0:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/sanctuary-type-identifiers/-/sanctuary-type-identifiers-2.0.1.tgz#fc524cf6dd92cebfcbb0dd9509eff193159a20ed"
-  integrity sha1-/FJM9t2Szr/LsN2VCe/xkxWaIO0=
+sanctuary-type-identifiers@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/sanctuary-type-identifiers/-/sanctuary-type-identifiers-3.0.0.tgz#51cb488d2ed9f194946a64ffe2b41dd49a348c0b"
+  integrity sha512-YFXYcG0Ura1dSPd/1xLYtE2XAWUEsBHhMTZvYBOvwT8MeFQwdUOCMm2DC+r94z6H93FVq0qxDac8/D7QpJj6Mg==
 
 scheduler@^0.13.2, scheduler@^0.13.6:
   version "0.13.6"
